@@ -1,0 +1,40 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")  // ✅ เวอร์ชั่น 5 ต้องใส่บรรทัดนี้ครับ
+}
+
+model Employee {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  position  String?
+  department String?
+  salary    Decimal?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  username   String?  @unique // ใช้สำหรับ login (หรือจะใช้อีเมลก็ได้)
+  password   String   @default("1234") // รหัสผ่าน (ค่าเริ่มต้น 1234)
+  role       String   @default("employee") // admin หรือ employee
+  attendances Attendance[]
+
+  @@map("employees")
+}
+
+model Attendance {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  clockIn    DateTime @default(now())
+  clockOut   DateTime?
+  status     String?
+  
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("attendance")
+}
